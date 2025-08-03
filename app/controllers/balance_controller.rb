@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "prawn"
+require "zip"
+
 class BalanceController < Sellers::BaseController
   include CurrencyHelper
   include PayoutsHelper
@@ -14,11 +17,11 @@ class BalanceController < Sellers::BaseController
     authorize :balance
 
     tab = params[:tab] || "payouts"
+    @seller_stats = UserBalanceStatsService.new(user: current_seller).fetch
+    pagination, _past_payouts = fetch_payouts
 
     if tab == "taxes"
       @title = "Taxes"
-      @seller_stats = UserBalanceStatsService.new(user: current_seller).fetch
-      pagination, _past_payouts = fetch_payouts
 
       # Generate tax documents data
       year = params[:year]&.to_i
@@ -32,8 +35,6 @@ class BalanceController < Sellers::BaseController
       )
     else
       @title = "Payouts"
-      @seller_stats = UserBalanceStatsService.new(user: current_seller).fetch
-      pagination, past_payouts = fetch_payouts
       @payout_presenter = PayoutsPresenter.new(
         next_payout_period_data: @seller_stats[:next_payout_period_data],
         processing_payout_periods_data: @seller_stats[:processing_payout_periods_data],
@@ -63,8 +64,6 @@ class BalanceController < Sellers::BaseController
     documents = tax_service.generate_tax_documents
 
     # Generate ZIP file with all documents
-    require "zip"
-
     temp_file = Tempfile.new(["tax_documents", ".zip"])
 
     Zip::File.open(temp_file.path, Zip::File::CREATE) do |zipfile|
@@ -140,8 +139,6 @@ class BalanceController < Sellers::BaseController
     end
 
     def generate_tax_document_content(document, year)
-      require "prawn"
-
       Prawn::Document.new do |pdf|
         pdf.font_size 12
         pdf.font "Helvetica"
@@ -154,7 +151,7 @@ class BalanceController < Sellers::BaseController
         pdf.text "Document: #{document[:name]}", size: 12
         pdf.text "Year: #{year}", size: 12
         pdf.text "Type: #{document[:type]}", size: 12
-        pdf.text "Generated: #{Time.now.strftime('%B %d, %Y at %I:%M %p')}", size: 12
+        pdf.text "Generated: #{Time.current.strftime('%B %d, %Y at %I:%M %p')}", size: 12
         pdf.move_down 20
 
         # Financial summary

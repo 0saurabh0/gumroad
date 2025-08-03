@@ -812,6 +812,8 @@ Rails.application.routes.draw do
     # balances
     get "/payouts", to: "balance#index", as: :balance
     get "/payouts/payments", to: "balance#payments_paged", as: :payments_paged
+    get "tax-documents/download-all", to: "balance#tax_documents_download_all", as: :tax_documents_download_all
+    get "tax-documents/:document_type/:quarter/download", to: "balance#tax_document_download", as: :tax_document_download
     resources :instant_payouts, only: [:create]
     namespace :payouts do
       resources :exportables, only: [:index]
@@ -857,9 +859,6 @@ Rails.application.routes.draw do
     post "/confirm-redirect", to: "url_redirects#confirm"
     post "/r/:id/send_to_kindle", to: "url_redirects#send_to_kindle", as: :send_to_kindle
     post "/r/:id/change_purchaser", to: "url_redirects#change_purchaser", as: :url_redirect_change_purchaser
-
-    get "tax-documents/download-all", to: "balance#tax_documents_download_all", as: :tax_documents_download_all
-    get "tax-documents/:document_type/:quarter/download", to: "balance#tax_document_download", as: :tax_document_download
 
     get "crossdomain", to: "public#crossdomain"
 

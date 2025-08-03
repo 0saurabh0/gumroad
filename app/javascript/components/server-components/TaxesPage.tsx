@@ -251,6 +251,15 @@ const TaxesPage = ({ tax_documents_data }: { tax_documents_data: TaxDocumentsDat
   const [selectedYear, setSelectedYear] = React.useState(tax_documents_data?.selected_year || new Date().getFullYear());
   const [isLoading, setIsLoading] = React.useState(false);
 
+  // Determine current tab from URL
+  const currentTab = React.useMemo(() => {
+    if (typeof window === "undefined") {
+      return "payouts";
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("tab") || "payouts";
+  }, []);
+
   const handleYearChange = (year: number) => {
     setSelectedYear(year);
     // Navigate to the taxes page with the selected year
@@ -323,10 +332,10 @@ const TaxesPage = ({ tax_documents_data }: { tax_documents_data: TaxDocumentsDat
         <h1>Tax documents</h1>
         {settingsAction ? <div className="actions flex gap-2">{settingsAction}</div> : null}
         <div role="tablist">
-          <a href={Routes.balance_path()} role="tab" aria-selected={false}>
+          <a href={Routes.balance_path()} role="tab" aria-selected={currentTab === "payouts"}>
             Payouts
           </a>
-          <a href={Routes.balance_path({ tab: "taxes" })} role="tab" aria-selected>
+          <a href={Routes.balance_path({ tab: "taxes" })} role="tab" aria-selected={currentTab === "taxes"}>
             Taxes
           </a>
         </div>

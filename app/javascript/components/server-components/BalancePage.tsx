@@ -661,6 +661,15 @@ const BalancePage = ({
 
   const [isInstantPayoutModalOpen, setIsInstantPayoutModalOpen] = React.useState(false);
   const [instantPayoutId, setInstantPayoutId] = React.useState<string>(instant_payout?.payable_balances[0]?.id ?? "");
+
+  // Determine current tab from URL
+  const currentTab = React.useMemo(() => {
+    if (typeof window === "undefined") {
+      return "payouts";
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get("tab") || "payouts";
+  }, []);
   const instantPayoutAmountCents =
     instant_payout?.payable_balances.reduce((sum, balance) => {
       const selectedBalance = instant_payout.payable_balances.find((b) => b.id === instantPayoutId);
@@ -709,10 +718,10 @@ const BalancePage = ({
           </div>
         ) : null}
         <div role="tablist">
-          <a href={Routes.balance_path()} role="tab" aria-selected>
+          <a href={Routes.balance_path()} role="tab" aria-selected={currentTab === "payouts"}>
             Payouts
           </a>
-          <a href={Routes.balance_path({ tab: "taxes" })} role="tab" aria-selected={false}>
+          <a href={Routes.balance_path({ tab: "taxes" })} role="tab" aria-selected={currentTab === "taxes"}>
             Taxes
           </a>
         </div>
