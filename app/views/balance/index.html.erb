@@ -1,2 +1,6 @@
 <%= load_pack("balance") %>
-<%= react_component "BalancePage", props: @payout_presenter.props, prerender: true %>
+<% if @taxes_presenter %>
+  <%= react_component "TaxesPage", props: @taxes_presenter.props, prerender: true %>
+<% else %>
+  <%= react_component "BalancePage", props: @payout_presenter.props, prerender: true %>
+<% end %>

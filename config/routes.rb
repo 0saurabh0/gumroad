@@ -858,6 +858,9 @@ Rails.application.routes.draw do
     post "/r/:id/send_to_kindle", to: "url_redirects#send_to_kindle", as: :send_to_kindle
     post "/r/:id/change_purchaser", to: "url_redirects#change_purchaser", as: :url_redirect_change_purchaser
 
+    get "tax-documents/download-all", to: "balance#tax_documents_download_all", as: :tax_documents_download_all
+    get "tax-documents/:document_type/:quarter/download", to: "balance#tax_document_download", as: :tax_document_download
+
     get "crossdomain", to: "public#crossdomain"
 
     get "/api", to: "public#api"

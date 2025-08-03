@@ -22,6 +22,21 @@ describe "Balance Pages Scenario", js: true, type: :feature do
       expect(page).to have_content "Let's get you paid."
     end
 
+    it "shows taxes tab and switches between payouts and taxes" do
+      visit balance_path
+
+      expect(page).to have_link("Payouts", href: balance_path)
+      expect(page).to have_link("Taxes", href: "#{balance_path}?tab=taxes")
+
+      click_on "Taxes"
+      expect(page).to have_current_path("#{balance_path}?tab=taxes")
+      expect(page).to have_content("Taxes")
+
+      click_on "Payouts"
+      expect(page).to have_current_path(balance_path)
+      expect(page).to have_content("Payouts")
+    end
+
     describe "affiliate commission" do
       let(:seller) { create(:affiliate_user, username: "momoney", user_risk_state: "compliant") }
       before do

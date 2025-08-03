@@ -32,6 +32,20 @@ describe BalanceController do
       payout_presenter = assigns(:payout_presenter)
       expect(payout_presenter.seller).to eq(seller)
     end
+
+    context "with taxes tab" do
+      it "assigns taxes presenter and renders template" do
+        expect(UserBalanceStatsService).to receive(:new).with(user: seller).and_call_original
+
+        get :index, params: { tab: "taxes" }
+        expect(response).to be_successful
+        expect(response).to render_template(:index)
+
+        taxes_presenter = assigns(:taxes_presenter)
+        expect(taxes_presenter.seller).to eq(seller)
+        expect(assigns(:title)).to eq("Taxes")
+      end
+    end
   end
 
   describe "GET payments_paged" do

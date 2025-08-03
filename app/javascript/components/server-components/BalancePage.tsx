@@ -708,6 +708,14 @@ const BalancePage = ({
             {bulkExportAction}
           </div>
         ) : null}
+        <div role="tablist">
+          <a href={Routes.balance_path()} role="tab" aria-selected>
+            Payouts
+          </a>
+          <a href={Routes.balance_path({ tab: "taxes" })} role="tab" aria-selected={false}>
+            Taxes
+          </a>
+        </div>
       </header>
       <div style={{ display: "grid", gap: "var(--spacer-7)" }}>
         {!instant_payout ? (
