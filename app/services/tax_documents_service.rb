@@ -55,7 +55,7 @@ class TaxDocumentsService
         taxes_cents: taxes_cents,
         net_cents: net_cents,
         is_new: true,
-        download_url: "/tax-documents/1099k/1099k/download?year=#{@year}"
+        download_url: "/tax-documents/1099k/annual/download?year=#{@year}"
       }
     end
 

@@ -40,7 +40,7 @@ class BalanceController < Sellers::BaseController
         processing_payout_periods_data: @seller_stats[:processing_payout_periods_data],
         seller: current_seller,
         pagination:,
-        past_payouts:
+        past_payouts: _past_payouts
       )
     end
   end

@@ -239,7 +239,7 @@ const RelatedArticlesSection = () => (
         }}
       >
         <a href="#" style={{ textDecoration: "none", color: "inherit" }}>
-          How to estimate quarterly taxes
+          This is a placeholder for a real article
         </a>
       </div>
     </div>
