@@ -31,7 +31,8 @@ class BalanceController < Sellers::BaseController
       @taxes_presenter = TaxesPresenter.new(
         tax_documents_data: @tax_documents_data,
         pagination: pagination,
-        seller: current_seller
+        seller: current_seller,
+        current_tab: tab
       )
     else
       @title = "Payouts"

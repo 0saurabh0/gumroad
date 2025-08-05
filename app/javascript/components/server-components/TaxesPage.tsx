@@ -246,19 +246,29 @@ const RelatedArticlesSection = () => (
   </section>
 );
 
-const TaxesPage = ({ tax_documents_data }: { tax_documents_data: TaxDocumentsData | null }) => {
+const TaxesPage = ({
+  tax_documents_data,
+  current_tab,
+}: {
+  tax_documents_data: TaxDocumentsData | null;
+  current_tab: string;
+}) => {
   const loggedInUser = useLoggedInUser();
   const [selectedYear, setSelectedYear] = React.useState(tax_documents_data?.selected_year || new Date().getFullYear());
   const [isLoading, setIsLoading] = React.useState(false);
 
-  // Determine current tab from URL
-  const currentTab = React.useMemo(() => {
-    if (typeof window === "undefined") {
-      return "payouts";
+  const activeTab = current_tab;
+
+  const handleTabClick = (tab: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    const url = new URL(window.location.href);
+    if (tab === "payouts") {
+      url.searchParams.delete("tab");
+    } else {
+      url.searchParams.set("tab", tab);
     }
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get("tab") || "payouts";
-  }, []);
+    window.location.href = url.toString();
+  };
 
   const handleYearChange = (year: number) => {
     setSelectedYear(year);
@@ -321,7 +331,6 @@ const TaxesPage = ({ tax_documents_data }: { tax_documents_data: TaxDocumentsDat
     </NavigationButton>
   ) : null;
 
-  // Use real data when available
   const hasDocuments = tax_documents_data?.documents && tax_documents_data.documents.length > 0;
   const documents = tax_documents_data?.documents || [];
   const availableYears = tax_documents_data?.available_years || [new Date().getFullYear()];
@@ -332,28 +341,38 @@ const TaxesPage = ({ tax_documents_data }: { tax_documents_data: TaxDocumentsDat
         <h1>Tax documents</h1>
         {settingsAction ? <div className="actions flex gap-2">{settingsAction}</div> : null}
         <div role="tablist">
-          <a href={Routes.balance_path()} role="tab" aria-selected={currentTab === "payouts"}>
+          <a
+            href={Routes.balance_path()}
+            role="tab"
+            aria-selected={activeTab === "payouts"}
+            onClick={(e) => handleTabClick("payouts", e)}
+          >
             Payouts
           </a>
-          <a href={Routes.balance_path({ tab: "taxes" })} role="tab" aria-selected={currentTab === "taxes"}>
+          <a
+            href={Routes.balance_path({ tab: "taxes" })}
+            role="tab"
+            aria-selected={activeTab === "taxes"}
+            onClick={(e) => handleTabClick("taxes", e)}
+          >
             Taxes
           </a>
         </div>
       </header>
 
       <div style={{ display: "grid", gap: "var(--spacer-7)" }}>
-        {hasDocuments ? (
-          <section>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "var(--spacer-4)",
-              }}
-            >
-              <h2>Tax documents</h2>
-              <div style={{ display: "flex", gap: "var(--spacer-3)", alignItems: "center" }}>
+        <section>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "var(--spacer-4)",
+            }}
+          >
+            <h2>Tax documents</h2>
+            <div style={{ display: "flex", gap: "var(--spacer-3)", alignItems: "center" }}>
+              {hasDocuments ? (
                 <Button
                   color="primary"
                   onClick={handleDownloadAll}
@@ -364,35 +383,34 @@ const TaxesPage = ({ tax_documents_data }: { tax_documents_data: TaxDocumentsDat
                   <Icon name="download" />
                   Download all
                 </Button>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => handleYearChange(Number(e.target.value))}
-                  style={{
-                    padding: "var(--spacer-2) var(--spacer-3)",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "4px",
-                    backgroundColor: "white",
-                    minWidth: "100px",
-                  }}
-                >
-                  {availableYears.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              ) : null}
+              <select
+                value={selectedYear}
+                onChange={(e) => handleYearChange(Number(e.target.value))}
+                style={{
+                  padding: "var(--spacer-2) var(--spacer-3)",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "4px",
+                  backgroundColor: "white",
+                  minWidth: "100px",
+                }}
+              >
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
             </div>
+          </div>
+          {hasDocuments ? (
             <TaxDocumentsTable documents={documents} onDownload={handleDownloadDocument} />
-          </section>
-        ) : (
-          <section>
-            <h2>Tax documents</h2>
+          ) : (
             <div style={{ marginTop: "var(--spacer-5)" }}>
               <TaxDocumentsEmpty />
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         <SaveOnTaxesSection />
         <FAQSection />

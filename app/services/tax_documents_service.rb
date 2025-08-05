@@ -11,7 +11,8 @@ class TaxDocumentsService
 
     # Generate 1099-K form if eligible
     if @user.eligible_for_1099_k?(@year)
-      documents << generate_1099k_document
+      document = generate_1099k_document
+      documents << document unless document.nil?
     end
 
     # Generate quarterly earning summaries
@@ -46,6 +47,9 @@ class TaxDocumentsService
       taxes_cents = sales_data.sum(:tax_cents)
       net_cents = gross_cents - fees_cents - taxes_cents
 
+      # Only return 1099-K if there are actual sales
+      return nil if gross_cents == 0
+
       {
         id: "1099k_#{@year}",
         name: "1099-K",
@@ -77,6 +81,9 @@ class TaxDocumentsService
         taxes_cents = sales_data.sum(:tax_cents)
         net_cents = gross_cents - fees_cents - taxes_cents
 
+        # Only return quarter if there are actual sales
+        next nil if gross_cents == 0
+
         {
           id: "#{quarter[:name].downcase}_#{@year}",
           name: "#{quarter[:name]} Earning summary",
@@ -87,7 +94,7 @@ class TaxDocumentsService
           net_cents: net_cents,
           download_url: "/tax-documents/quarterly/#{quarter[:name].downcase}/download?year=#{@year}"
         }
-      end
+      end.compact
     end
 
     def available_years
