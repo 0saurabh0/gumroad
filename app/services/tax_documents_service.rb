@@ -81,9 +81,7 @@ class TaxDocumentsService
         taxes_cents = sales_data.sum(:tax_cents)
         net_cents = gross_cents - fees_cents - taxes_cents
 
-        # Only return quarter if there are actual sales
-        next nil if gross_cents == 0
-
+        # Always return quarter document, even with 0 values
         {
           id: "#{quarter[:name].downcase}_#{@year}",
           name: "#{quarter[:name]} Earning summary",
@@ -94,11 +92,14 @@ class TaxDocumentsService
           net_cents: net_cents,
           download_url: "/tax-documents/quarterly/#{quarter[:name].downcase}/download?year=#{@year}"
         }
-      end.compact
+      end
     end
 
     def available_years
       current_year = Time.current.year
-      ((current_year - 3)..current_year).to_a
+      years_with_sales = @user.sales.successful.pluck(:created_at).map(&:year).uniq.sort
+
+      # Include years with sales plus current year
+      (years_with_sales + [current_year]).uniq.sort
     end
 end

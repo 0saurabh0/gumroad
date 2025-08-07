@@ -28,6 +28,11 @@ class BalanceController < Sellers::BaseController
       tax_service = TaxDocumentsService.new(current_seller, year)
       @tax_documents_data = tax_service.tax_documents_data
 
+      # If no year was provided and no default year is available, use current year
+      if year.nil? && @tax_documents_data[:selected_year].nil?
+        @tax_documents_data[:selected_year] = Time.current.year
+      end
+
       @taxes_presenter = TaxesPresenter.new(
         tax_documents_data: @tax_documents_data,
         pagination: pagination,

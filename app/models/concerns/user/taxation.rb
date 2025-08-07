@@ -94,16 +94,16 @@ module User::Taxation
     alive_user_compliance_info&.country_code == Compliance::Countries::USA.alpha2
   end
 
-  private
-    def sales_scope_for(year)
-      range = Date.new(year).in_time_zone(timezone).all_year
-      sales.successful.not_fully_refunded.not_chargedback_or_chargedback_reversed
-           .where("purchases.price_cents > 0")
-           .where(paypal_order_id: nil)
-           .where.not(merchant_account_id: merchant_accounts.select { _1.is_a_stripe_connect_account? }.map(&:id))
-           .where(created_at: range)
-    end
+  def sales_scope_for(year)
+    range = Date.new(year).in_time_zone(timezone).all_year
+    sales.successful.not_fully_refunded.not_chargedback_or_chargedback_reversed
+         .where("purchases.price_cents > 0")
+         .where(paypal_order_id: nil)
+         .where.not(merchant_account_id: merchant_accounts.select { _1.is_a_stripe_connect_account? }.map(&:id))
+         .where(created_at: range)
+  end
 
+  private
     def affiliate_sales_scope_for(year)
       range = Date.new(year).in_time_zone(timezone).all_year
       affiliate_sales.successful.not_fully_refunded.not_chargedback_or_chargedback_reversed.where(created_at: range)
