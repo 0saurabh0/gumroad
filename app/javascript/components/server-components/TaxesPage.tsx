@@ -174,6 +174,32 @@ const PartnerCard = ({
   );
 };
 
+const DownloadButton = ({
+  document,
+  onDownload,
+}: {
+  document: TaxDocument;
+  onDownload: (document: TaxDocument) => void;
+}) => {
+  const { handleMouseEnter, handleMouseLeave } = useHoverEffect(2);
+
+  return (
+    <button
+      onClick={() => onDownload(document)}
+      aria-label={`Download ${document.name}`}
+      style={{
+        ...commonButtonStyles,
+        padding: "2px 8px",
+        minHeight: "28px",
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      Download
+    </button>
+  );
+};
+
 const TaxDocumentsTable = ({
   documents,
   onDownload,
@@ -252,24 +278,7 @@ const TaxDocumentsTable = ({
             })}
           </td>
           <td style={{ padding: "16px 12px" }}>
-            {(() => {
-              const { handleMouseEnter, handleMouseLeave } = useHoverEffect(2);
-              return (
-                <button
-                  onClick={() => onDownload(document)}
-                  aria-label={`Download ${document.name}`}
-                  style={{
-                    ...commonButtonStyles,
-                    padding: "2px 8px",
-                    minHeight: "28px",
-                  }}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  Download
-                </button>
-              );
-            })()}
+            <DownloadButton document={document} onDownload={onDownload} />
           </td>
         </tr>
       ))}
