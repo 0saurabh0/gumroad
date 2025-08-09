@@ -71,7 +71,7 @@ class TaxDocumentsService
         { name: "Q4", start_date: Date.new(@year, 10, 1), end_date: Date.new(@year, 12, 31) }
       ]
 
-      quarters.map do |quarter|
+      quarter_documents = quarters.map do |quarter|
         sales_data = @user.sales
           .successful
           .where(created_at: quarter[:start_date]..quarter[:end_date])
@@ -81,7 +81,6 @@ class TaxDocumentsService
         taxes_cents = sales_data.sum(:tax_cents)
         net_cents = gross_cents - fees_cents - taxes_cents
 
-        # Always return quarter document, even with 0 values
         {
           id: "#{quarter[:name].downcase}_#{@year}",
           name: "#{quarter[:name]} Earning summary",
@@ -93,13 +92,24 @@ class TaxDocumentsService
           download_url: "/tax-documents/quarterly/#{quarter[:name].downcase}/download?year=#{@year}"
         }
       end
+
+      # Check if all quarters have 0 data
+      all_quarters_zero = quarter_documents.all? { |doc| doc[:gross_cents] == 0 }
+
+      if all_quarters_zero
+        # Return empty array to show placeholder
+        []
+      else
+        # Return only quarters with data
+        quarter_documents.select { |doc| doc[:gross_cents] > 0 }
+      end
     end
 
     def available_years
       current_year = Time.current.year
       years_with_sales = @user.sales.successful.pluck(:created_at).map(&:year).uniq.sort
 
-      # Include years with sales plus current year
+      # Always include current year and years with sales
       (years_with_sales + [current_year]).uniq.sort
     end
 end
