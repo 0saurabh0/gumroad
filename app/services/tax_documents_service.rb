@@ -88,14 +88,14 @@ class TaxDocumentsService
 
   private
     def default_year_for_user
-      years_with_sales = user.sales.in_progress_or_successful_including_test.pluck(:created_at).map(&:year).uniq.sort
+      years_with_sales = user.sales.in_progress_or_successful.excluding_test.pluck(:created_at).map(&:year).uniq.sort
       return Time.current.year if years_with_sales.empty?
 
       years_with_sales.last
     end
 
     def generate_1099k_document
-      sales_data = user.sales.in_progress_or_successful_including_test.where("EXTRACT(YEAR FROM created_at) = ?", year)
+      sales_data = user.sales.in_progress_or_successful.excluding_test.where("EXTRACT(YEAR FROM created_at) = ?", year)
       gross_cents = sales_data.sum(:total_transaction_cents)
       fees_cents = sales_data.sum(:fee_cents)
       taxes_cents = sales_data.sum(:tax_cents)
@@ -126,7 +126,8 @@ class TaxDocumentsService
 
       quarter_documents = quarters.map do |quarter|
         sales_data = user.sales
-          .in_progress_or_successful_including_test
+          .in_progress_or_successful
+          .excluding_test
           .where(created_at: quarter[:start_date]..quarter[:end_date])
 
         gross_cents = sales_data.sum(:total_transaction_cents)
@@ -158,7 +159,7 @@ class TaxDocumentsService
 
     def available_years
       current_year = Time.current.year
-      years_with_sales = user.sales.in_progress_or_successful_including_test.pluck(:created_at).map(&:year).uniq.sort
+      years_with_sales = user.sales.in_progress_or_successful.excluding_test.pluck(:created_at).map(&:year).uniq.sort
 
       (years_with_sales + [current_year]).uniq.sort
     end

@@ -431,6 +431,8 @@ class Purchase < ApplicationRecord
   scope :test_successful, -> { where(purchase_state: "test_successful") }
   scope :in_progress, -> { where(purchase_state: "in_progress") }
   scope :in_progress_or_successful_including_test, -> { where(purchase_state: %w(in_progress successful test_successful)) }
+  scope :excluding_test, -> { where.not(purchase_state: "test_successful") }
+  scope :in_progress_or_successful, -> { where(purchase_state: %w(in_progress successful)) }
   scope :not_in_progress, -> { where.not(purchase_state: "in_progress") }
   scope :not_successful, -> { without_purchase_state(:successful) }
   scope :successful_gift_or_nongift, -> { where(purchase_state: ["successful", "gift_receiver_purchase_successful"]) }

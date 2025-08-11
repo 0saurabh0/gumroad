@@ -6,7 +6,7 @@ class TaxesController < Sellers::BaseController
   def index
     authorize :balance
 
-    year = params[:year]&.to_i || Time.current.year
+    year = selected_year
     tax_service = TaxDocumentsService.new(current_seller, year)
     @tax_documents_data = tax_service.tax_documents_data
     @taxes_presenter = TaxesPresenter.new(
@@ -21,7 +21,7 @@ class TaxesController < Sellers::BaseController
   def tax_documents_download_all
     authorize :balance, :index?
 
-    year = params[:year]&.to_i || Time.current.year
+    year = selected_year
     tax_service = TaxDocumentsService.new(current_seller, year)
     documents = tax_service.generate_tax_documents
 
@@ -58,7 +58,7 @@ class TaxesController < Sellers::BaseController
   def tax_document_download
     authorize :balance, :index?
 
-    year = params[:year]&.to_i || Time.current.year
+    year = selected_year
     document_type = params[:document_type]
     identifier = params[:identifier]
 
@@ -80,7 +80,7 @@ class TaxesController < Sellers::BaseController
     # Generate PDF using the service
     begin
       pdf_content = tax_service.generate_pdf(document)
-    rescue => e
+    rescue StandardError => e
       Rails.logger.error("Failed to generate PDF for document #{document[:id]}: #{e.message}")
       render json: { success: false, error: "Failed to generate PDF document" }, status: :internal_server_error
       return
@@ -95,5 +95,10 @@ class TaxesController < Sellers::BaseController
   private
     def set_on_taxes_page
       @on_taxes_page = true
+    end
+
+    def selected_year
+      y = params[:year].to_s
+      (/\A\d{4}\z/ =~ y) ? y.to_i : Time.current.year
     end
 end
