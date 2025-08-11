@@ -661,6 +661,7 @@ const BalancePage = ({
 
   const [isInstantPayoutModalOpen, setIsInstantPayoutModalOpen] = React.useState(false);
   const [instantPayoutId, setInstantPayoutId] = React.useState<string>(instant_payout?.payable_balances[0]?.id ?? "");
+
   const instantPayoutAmountCents =
     instant_payout?.payable_balances.reduce((sum, balance) => {
       const selectedBalance = instant_payout.payable_balances.find((b) => b.id === instantPayoutId);
@@ -708,6 +709,30 @@ const BalancePage = ({
             {bulkExportAction}
           </div>
         ) : null}
+        <div role="tablist">
+          <a
+            href={Routes.balance_path()}
+            role="tab"
+            aria-selected={true}
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = Routes.balance_path();
+            }}
+          >
+            Payouts
+          </a>
+          <a
+            href="/payouts/taxes"
+            role="tab"
+            aria-selected={false}
+            onClick={(e) => {
+              e.preventDefault();
+              window.location.href = "/payouts/taxes";
+            }}
+          >
+            Taxes
+          </a>
+        </div>
       </header>
       <div style={{ display: "grid", gap: "var(--spacer-7)" }}>
         {!instant_payout ? (

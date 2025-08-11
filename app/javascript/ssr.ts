@@ -94,6 +94,7 @@ import SubscribePreview from "$app/components/server-components/SubscribePreview
 import SubscriptionManager from "$app/components/server-components/SubscriptionManager";
 import SubscriptionManagerMagicLink from "$app/components/server-components/SubscriptionManagerMagicLink";
 import TaxesCollectionModal from "$app/components/server-components/TaxesCollectionModal";
+import TaxesPage from "$app/components/server-components/TaxesPage";
 import TwoFactorAuthenticationPage from "$app/components/server-components/TwoFactorAuthenticationPage";
 import UtmLinksPage from "$app/components/server-components/UtmLinksPage";
 import VideoStreamPlayer from "$app/components/server-components/VideoStreamPlayer";
@@ -135,6 +136,7 @@ ReactOnRails.register({
   AudiencePage,
   AuthorizedApplicationsSettingsPage,
   BalancePage,
+  TaxesPage,
   BundleEditPage,
   CheckoutPage,
   CollaboratorsPage,
