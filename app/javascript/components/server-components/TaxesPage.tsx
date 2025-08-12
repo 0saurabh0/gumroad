@@ -134,78 +134,65 @@ const TaxDocumentsTable = ({
   documents: TaxDocument[];
   onDownload: (document: TaxDocument) => void;
 }) => (
-  <table
-    style={{
-      borderCollapse: "separate",
-      borderSpacing: "0",
-      backgroundColor: "transparent",
-      marginTop: "var(--spacer-4)",
-      borderRadius: "8px",
-      overflow: "visible",
-      border: "1px solid var(--border-color)",
-    }}
-  >
+  <table aria-live="polite">
     <thead>
-      <tr style={{ borderBottom: "1px solid var(--border-color)" }}>
-        <th style={{ textAlign: "left", padding: "12px 12px", fontWeight: 700 }}>Document</th>
-        <th style={{ textAlign: "left", padding: "12px 12px", fontWeight: 700 }}>Type</th>
-        <th style={{ textAlign: "left", padding: "12px 12px", fontWeight: 700 }}>Gross</th>
-        <th style={{ textAlign: "left", padding: "12px 12px", fontWeight: 700 }}>Fees</th>
-        <th style={{ textAlign: "left", padding: "12px 12px", fontWeight: 700 }}>Taxes</th>
-        <th style={{ textAlign: "left", padding: "12px 12px", fontWeight: 700 }}>Net</th>
-        <th style={{ textAlign: "left", padding: "12px 12px", fontWeight: 700 }}></th>
+      <tr>
+        <th>Document</th>
+        <th>Type</th>
+        <th>Gross</th>
+        <th>Fees</th>
+        <th>Taxes</th>
+        <th>Net</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
-      {documents.map((document) => (
-        <tr key={document.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
-          <td style={{ padding: "12px 12px" }}>
+      {documents.map((taxDocument) => (
+        <tr key={taxDocument.id}>
+          <td>
             <div style={{ display: "flex", alignItems: "center", gap: "var(--spacer-2)" }}>
-              {/* {document.is_new ? (
-                <span
-                  style={{
-                    backgroundColor: "rgb(var(--gray-1))",
-                    color: "rgb(var(--gray-3))",
-                    fontSize: "12px",
-                    padding: "2px 6px",
-                    borderRadius: "4px",
-                  }}
+              {taxDocument.is_new ? (
+                <div
+                  className="pill small"
+                  style={{ backgroundColor: "rgb(var(--gray-1))", color: "rgb(var(--gray-3))" }}
                 >
                   New
-                </span>
-              ) : null} */}
-              {document.name}
+                </div>
+              ) : null}
+              <div>{taxDocument.name || ""}</div>
             </div>
           </td>
-          <td style={{ padding: "12px 12px", color: "rgb(var(--gray-3))" }}>{document.type}</td>
-          <td style={{ padding: "12px 12px", textAlign: "left", fontWeight: "500" }}>
-            {formatPriceCentsWithCurrencySymbol("usd", document.gross_cents, {
+          <td>{taxDocument.type}</td>
+          <td style={{ whiteSpace: "nowrap" }}>
+            {formatPriceCentsWithCurrencySymbol("usd", taxDocument.gross_cents, {
               symbolFormat: "short",
               noCentsIfWhole: false,
             })}
           </td>
-          <td style={{ padding: "12px 12px", textAlign: "left" }}>
+          <td style={{ whiteSpace: "nowrap" }}>
             -
-            {formatPriceCentsWithCurrencySymbol("usd", Math.abs(document.fees_cents), {
+            {formatPriceCentsWithCurrencySymbol("usd", Math.abs(taxDocument.fees_cents), {
               symbolFormat: "short",
               noCentsIfWhole: false,
             })}
           </td>
-          <td style={{ padding: "12px 12px", textAlign: "left" }}>
+          <td style={{ whiteSpace: "nowrap" }}>
             -
-            {formatPriceCentsWithCurrencySymbol("usd", Math.abs(document.taxes_cents), {
+            {formatPriceCentsWithCurrencySymbol("usd", Math.abs(taxDocument.taxes_cents), {
               symbolFormat: "short",
               noCentsIfWhole: false,
             })}
           </td>
-          <td style={{ padding: "12px 12px", textAlign: "left", fontWeight: "500" }}>
-            {formatPriceCentsWithCurrencySymbol("usd", document.net_cents, {
+          <td style={{ whiteSpace: "nowrap", fontWeight: "500" }}>
+            {formatPriceCentsWithCurrencySymbol("usd", taxDocument.net_cents, {
               symbolFormat: "short",
               noCentsIfWhole: false,
             })}
           </td>
-          <td style={{ padding: "12px 12px" }}>
-            <DownloadButton document={document} onDownload={onDownload} />
+          <td>
+            <div className="actions">
+              <DownloadButton document={taxDocument} onDownload={onDownload} />
+            </div>
           </td>
         </tr>
       ))}
@@ -214,8 +201,12 @@ const TaxDocumentsTable = ({
 );
 
 const TaxDocumentsEmpty = () => (
-  <div style={{ textAlign: "center" }}>
-    <img src={taxesPlaceholder} alt="Tax documents placeholder" style={{ maxWidth: "100%", height: "auto" }} />
+  <div className="placeholder">
+    <figure>
+      <img src={taxesPlaceholder} alt="Tax documents placeholder" />
+    </figure>
+    <h2>Let's get your tax info ready.</h2>
+    <p>Your 1099-K and quarterly summaries will appear here once they're available.</p>
   </div>
 );
 
